@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
       hosted_rooms: [String] // string of chatroomId
     },
     { timestamps: true },
-    );
+);
 
 // Method to set salt and hash the password for a user
 userSchema.methods.setPassword = function (password) {
@@ -39,5 +39,4 @@ userSchema.methods.validPassword = function (password) {
 
   
 const userModel = mongoose.model('user', userSchema);
-
 module.exports = userModel;

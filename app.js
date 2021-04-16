@@ -6,7 +6,7 @@ require('dotenv').config();
 const sanityCheckRouter = require('./routes/sanityCheck.router');
 
 const authRouter = require('./routes/auth.router');
-// const adminRoutes = require('./routes/admin');
+const moderatorRouter = require('./routes/moderator.router');
 
 
 
@@ -29,10 +29,11 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.use('/', sanityCheckRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/moderator', moderatorRouter);
+
 
 
 const port = process.env.PORT || 8000;
-
 app.listen(port, () => {
   console.log(`App running on ${port}`);
 });

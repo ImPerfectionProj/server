@@ -1,7 +1,7 @@
 const UserModel = require('../models/user.schema');
 const { v4: uuid } = require('uuid');
 
-const createUser = async (password, name, email, phoneNumber, role, description=null, tags=null, profilePic=null) => {
+const createUser = async (password, name, email, phoneNumber) => {
     if (!password || !name || !email || !phoneNumber){
         console.log(password, name, email, phoneNumber);
         throw new BadInputError(`missing parameters: ${password} ${name} ${email} ${phoneNumber}`);
@@ -16,11 +16,7 @@ const createUser = async (password, name, email, phoneNumber, role, description=
         userId: uuid(),
         name, 
         email,
-        phoneNumber,
-        role,
-        description,
-        tags,
-        profilePic
+        phoneNumber
     });
 
     userInstance.setPassword(password);

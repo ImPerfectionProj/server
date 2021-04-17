@@ -63,12 +63,12 @@ const changeTags = async( userId, tags) => {
     return confirmedUser;
 }
 
-const changeProfileUrl = async( userId, profileUrl) => {
+const changeProfilePic = async( userId, profilePic) => {
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
         return null;
     }
-    retrievedUser.profileUrl = profileUrl;
+    retrievedUser.profilePic = profilePic;
     const confirmedUser = await retrievedUser.save();
     return confirmedUser;
 }
@@ -103,56 +103,61 @@ const changeDescription = async( userId, description) => {
     return confirmedUser;
 }
 
-const deleteFollowModerator = async(moderatorId, followerId) => {
+
+const addFollow = async( userId, moderatorId) => {
+    if (!await UserModel.findOne({userId})){
+        throw Error(`User with ID ${userId} does not exist`);
+    }
+    if (!await UserModel.findOne({userId:moderatorId, role:"moderator"})){
+        throw Error(`Moderator with ID ${moderatorId} does not exist`);
+    }
+
+    UserModel.updateOne({"userId":userId},
+        {$addToSet: {following_list: moderatorId}}).catch((err) => {
+            console.log('Error: ' + err);
+        });;
+
+    UserModel.updateOne({"userId":moderatorId},
+        {$addToSet: {following_list: userId}}).catch((err) => {
+            console.log('Error: ' + err);
+        });;
+
+    const updatedUser = await UserModel.findOne({userId});
+    const updatedModerator  = await UserModel.findOne({userId:moderatorId});
+    return {"follower":updatedUser, "moderator":updatedModerator};
+}
+
+const deleteFollow = async( userId, moderatorId) => {
+    if (!await UserModel.findOne({userId})){
+        throw Error(`User with ID ${userId} does not exist`);
+    }
+    if (!await UserModel.findOne({userId:moderatorId, role:"moderator"})){
+        throw Error(`Moderator with ID ${moderatorId} does not exist`);
+    }
+
+    const retrievedUser = await UserModel.findOne({userId, 
+        following_list:{$in :[moderatorId]}});
     const retrieveModerator = await UserModel.findOne({userId:moderatorId, 
-        following_list:{$nin :[followerId]}});
-    if (!retrieveModerator){
-        return null;
-    } 
-    UserModel.update({userId:moderatorId},
-        {$pull: {following_list: {$nin :[followerId]}}});
-
-    return await UserModel.findOne({userId:moderatorId, 
-        following_list});
-}
-const addFollowModerator = async(moderatorId, followerId) => {
-    const retrieveModerator = await UserModel.findOne({userId:moderatorId, 
-        following_list:{$nin :[followerId]}});
-    if (!retrieveModerator){
-        return null;
-    } 
-    UserModel.update({userId:moderatorId},
-        {$push: {following_list: {$addToSet :[followerId]}}});
-
-    return await UserModel.findOne({userId:moderatorId, 
-        following_list});
-}
-
-const addFollow = async( userId, follows) => {
-    const retrievedUser = await UserModel.findOne({userId});
+        role:"moderator"});
     if (!retrievedUser){
-        return null;
+        console.log(`User with ID ${userId} is not following Moderator ${userId}`);
+        return {"follower":retrievedUser, "moderator":retrieveModerator};   
     }
-    UserModel.update({userId:userId},
-        {following_list: {$addtoSet: [follows]}});
-    for (f in follows){
-        addFollowModerator(f, userId);
-    }
+    UserModel.updateOne({userId},
+        {$pull: {following_list: moderatorId}}).
+        catch((err) => {
+            console.log('Error: ' + err);
+        });;
+    
+    UserModel.updateOne({userId:moderatorId},
+        {$pull: {following_list: userId}}).
+        catch((err) => {
+            console.log('Error: ' + err);
+        });;
 
-    return await UserModel.findOne({userId});
-}
-
-const deleteFollow = async( userId, follows) => {
-    const retrievedUser = await UserModel.findOne({userId});
-    if (!retrievedUser){
-        return null;
-    }
-    retrievedUser.tags = tags;
-    for (f in follows){
-        deleteFollowModerator(f, userId);
-    }
-
-    return await UserModel.findOne({userId});
+    const updatedUser = await UserModel.findOne({userId});
+    const updatedModerator  = await UserModel.findOne({userId:moderatorId});
+    return {"follower":updatedUser, "moderator":updatedModerator};
 }
 
 const applyForModerator = async(userId) => {
@@ -167,7 +172,7 @@ module.exports = {
     resetPassword,
     changeUsername,
     changeTags,
-    changeProfileUrl,
+    changeProfilePic,
     changeEmail,
     changePhoneNumber,
     changeDescription,

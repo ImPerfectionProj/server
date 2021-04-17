@@ -30,11 +30,12 @@ const endRoom = async(roomId) =>{
     const retrievedChatroom = await RoomModel.findOne({roomId});
     if (retrievedChatroom){
         if (retrievedChatroom.active){
-        retrievedChatroom.endtime = Date.now ;
+        retrievedChatroom.endtime = Date.now() ;
         retrievedChatroom.active = false;
         const confirmdRoom = await retrievedChatroom.save();
         return confirmdRoom;
         } else {
+            console.log('Room with ID ${roomId} has already been ended')
             return retrievedChatroom;
             // throw new  BadInputError(`Room with ID ${roomId} has already been ended`);
         }
@@ -54,20 +55,34 @@ const retrieve_With_RoomId_HostId = async (roomId, hostId) => {
 };
 
 
-const joinRoom = async (roomId, userid, anonymous) => {
-    // retrieve roomInstance
-    // check if the user 
+const joinRoom = async (roomId, userId, anonymous) => {
+
+    console.log(userId);
     const retrievedChatroom = await RoomModel.findOne({roomId});
-    if (retrievedChatroom && retrievedChatroom.active){
-        retrievedChatroom.participants.update({userid: uid}, 
-            { userid:uid, anonymous:isanonymous,canSpeak:false}, 
-            { upsert : true }, callback);
-        console.log(retrievedChatroom.participants.findOne({userid:userid}));
-        const confirmdRoom = await retrievedChatroom.save();
-        return confirmdRoom
-    } else{
-        throw new BadInputError(`Room with ID ${roomId} does not exist`);
+    if (!retrievedChatroom || ! retrievedChatroom.active){
+        throw new Error(`Room with ID ${roomId} does not exist`);
     }
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser){
+        throw new Error(`User with ID ${userId} does not exist`);
+    }
+
+    const existParticipant = await RoomModel.findOne({roomId,"participants.userId":userId});
+    const existModerator = await RoomModel.findOne({roomId,"moderators":{$nin :[userId]}});
+    if (existParticipant || existModerator){
+        console.log(`User with ID ${userId} already joined room `);
+        return retrievedChatroom;
+    }
+    RoomModel.updateOne({"roomId":roomId}, 
+            {$addToSet: {participants:{"userId":userId, 
+                                    "anonymous":anonymous,
+                                    "canSpeak":false}}})
+        .catch((err) => {
+            console.log('Error: ' + err);
+        });
+    const confirmdRoom = await RoomModel.findOne({roomId});
+    return confirmdRoom
+    
     
   };
   

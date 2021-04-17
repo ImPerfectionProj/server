@@ -5,6 +5,9 @@ const roomService = require('../services/room.service');
 
 router.post('/join', async (req,res) => {
     const {userId, roomId, anonymous} = req.body;
+    console.log(userId);
+    console.log(roomId);
+    console.log(anonymous)
     // const isParticipant = moderatorService.verifyParticipant(userId);
     // if (isParticipant){
     try{
@@ -21,7 +24,8 @@ router.post('/join', async (req,res) => {
             endtime: confirmedRoom.endtime
           }); 
     } catch(err){
-        res.status(400).json({message: `Fail to join into Room ${roomId}`})
+      console.log(err)
+      res.status(400).json({message: `Fail to join into Room ${roomId}`})
     }
     
     // }else{

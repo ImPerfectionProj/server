@@ -45,6 +45,8 @@ router.post('/signup', async (req,res) => {
   }  
 });
 
+
+
 router.post('/signup-addition', async (req, res) => {
   const { profilePic, tags, email, password } = req.body;
   console.log('adding avatar and tags');

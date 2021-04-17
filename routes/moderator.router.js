@@ -30,17 +30,8 @@ router.post('/endRoom/:roomId', async (req,res) => {
     const roomId = req.params.roomId;
 
     try{
-        const newRoomInstance = await roomService.endRoom(userId);
-        res.status(200).json({
-            roomId: newRoomInstance.roomId,
-            name: newRoomInstance.name,
-            topics: newRoomInstance.topics,
-            description: newRoomInstance.description,
-            moderators: newRoomInstance.moderators,
-            active: newRoomInstance.active,
-            starttime: newRoomInstance.starttime,
-            endtime: newRoomInstance.endtime
-          }); 
+        const newRoomInstance = await roomService.endRoom(roomId);
+        res.status(200).json(newRoomInstance); 
     }catch(e) {
         console.log(e);
         res.status(400).json({

@@ -13,5 +13,18 @@ router.get('/all_active_rooms', async (req,res) => {
       }); 
 });
 
+router.delete('/clear_room_participants/:roomId', async(req, res) =>{
+  const roomId = req.params.roomId;  
+  try{
+    const room= await RoomModel.findOne({roomId});
+    room.participants = [];
+    const result = await room.save();
+    res.status(200).json(result);
+    return result;
+  }catch(err){
+    console.log(err);
+    res.status(400).console("Cannot Clear Room")
+  }
+});
 
 module.exports = router;

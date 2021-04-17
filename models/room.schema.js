@@ -9,12 +9,14 @@ const chatroomSchema = new mongoose.Schema(
       description: String,
       moderators: [String],
       participants: [],
-      active: Boolean,
+      active: { type : Boolean, default: true },
       starttime: { type : Date, default: Date.now },
       endtime: Date
     },
     { timestamps: true },
 );
+
+
 
 const chatroomModel = mongoose.model('chatroom', chatroomSchema);
 module.exports = chatroomModel;

@@ -4,7 +4,7 @@ const moderatorService = require('../services/moderator.service');
 const roomService = require('../services/room.service');
 
 
-router.get('/host', async (req,res)=>{
+router.get('/host', async (req,res) => {
     const {userId, name, topics, description} = req.body;
     const isModerator = moderatorService.verifyIdentity(userId);
     if (isModerator){
@@ -25,22 +25,36 @@ router.get('/host', async (req,res)=>{
     }
 });
 
-router.post('/mute/:mute_uid', async (req,res)=>{
+router.post('/changeMuteStatus/:mute_uid', async (req,res)=>{
     const mute_uid = req.params.mute_uid;
-    const {roomId, hostId} = req.body;
+    const {roomId, hostId, mute} = req.body;
     try{
         const retrievedRoom = await roomService.retrieve_With_RoomId_HostId(roomId, hostId);
         for (let i=0; i<retrievedRoom.participants.length; i++){
             if (retrievedRoom.participants[i].userId===mute_uid){
-                retrievedRoom.participants[i].canSpeak = false;
+                retrievedRoom.participants[i].canSpeak = !mute;
             }
         }
         const confirmedRoom = await retrievedRoom.save();
-        return confirmedRoom;
+        res.status(200).json({
+            roomId: confirmedRoom.roomId,
+            name: confirmedRoom.name,
+            topics: confirmedRoom.topics,
+            description: confirmedRoom.description,
+            moderators: confirmedRoom.moderators,
+            participants: confirmedRoom.participants,
+            active: confirmedRoom.active,
+            starttime: confirmedRoom.starttime
+          }); 
     }catch (e) {
         console.log(e);
+        res.status(400).json({
+            message: "cannot mute the user"
+        });
     }
 });
+
+
 
 router.post('', async (req,res)=>{});
 

@@ -7,6 +7,7 @@ const sanityCheckRouter = require('./routes/sanityCheck.router');
 
 const authRouter = require('./routes/auth.router');
 const moderatorRouter = require('./routes/moderator.router');
+const roomRouter = require('./routes/room.router');
 
 
 
@@ -30,10 +31,35 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', sanityCheckRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/moderator', moderatorRouter);
+app.use('/api/room', roomRouter);
+
 
 
 
 const port = process.env.PORT || 8000;
+
+
+// show all implemented endpoints
+let showRoutes = 1;
+if (showRoutes){
+  let route, routes = [];
+  app._router.stack.forEach(function(middleware){
+    if(middleware.route){ // routes registered directly on the app
+        routes.push(middleware.route);
+    } else if(middleware.name === 'router'){ // router middleware 
+        middleware.handle.stack.forEach(function(handler){
+            route = handler.route;
+            route && routes.push(route);
+        });
+    }
+  });
+  console.log(route);
+  console.log(routes);
+}
+
+
 app.listen(port, () => {
+  
   console.log(`App running on ${port}`);
 });
+

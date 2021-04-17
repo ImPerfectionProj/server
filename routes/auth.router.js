@@ -16,11 +16,12 @@ router.post('/signin', async (req, res) => {
       name: retrievedUser.name,
       profilePic: retrievedUser.profilePic,
       role: retrievedUser.role,
+      userId: retrievedUser.userId
     });
   }else{
     res.status(400).json({
       message: "User not found"
-    })
+    });
   }
 });
 

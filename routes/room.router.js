@@ -14,5 +14,4 @@ router.get('/all_active_rooms', async (req,res) => {
 });
 
 
-
 module.exports = router;

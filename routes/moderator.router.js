@@ -9,6 +9,7 @@ router.get('/host', async (req,res) => {
     const isModerator = moderatorService.verifyIdentity(userId);
     if (isModerator){
         const newRoomInstance = await roomService.createRoom(userId, name, topics, description);
+        
         res.status(200).json({
             roomId: newRoomInstance.roomId,
             name: newRoomInstance.name,
@@ -21,6 +22,29 @@ router.get('/host', async (req,res) => {
     }else{
         res.status(400).json({
             message: "User does not have room hosting permission"
+        });
+    }
+});
+
+router.post('/endRoom/:roomId', async (req,res) => {
+    const roomId = req.params.roomId;
+
+    try{
+        const newRoomInstance = await roomService.endRoom(userId);
+        res.status(200).json({
+            roomId: newRoomInstance.roomId,
+            name: newRoomInstance.name,
+            topics: newRoomInstance.topics,
+            description: newRoomInstance.description,
+            moderators: newRoomInstance.moderators,
+            active: newRoomInstance.active,
+            starttime: newRoomInstance.starttime,
+            endtime: newRoomInstance.endtime
+          }); 
+    }catch(e) {
+        console.log(e);
+        res.status(400).json({
+            message: `Fail to end room with id ${roomId}`
         });
     }
 });

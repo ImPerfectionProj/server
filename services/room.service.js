@@ -26,9 +26,11 @@ const createRoom = async (userId, name, topics, description) => {
     return confirmdRoom;
 };
 
-const endRoom = async(roomId) =>{
+const endRoom = async(roomId, hostId) =>{
     const retrievedChatroom = await RoomModel.findOne({roomId});
-    if (retrievedChatroom){
+    console.log(roomId)
+    console.log(retrievedChatroom)
+    if (retrievedChatroom && retrievedChatroom.moderators.includes(hostId)){
         if (retrievedChatroom.active){
         retrievedChatroom.endtime = Date.now() ;
         retrievedChatroom.active = false;
@@ -39,8 +41,11 @@ const endRoom = async(roomId) =>{
             return retrievedChatroom;
             // throw new  BadInputError(`Room with ID ${roomId} has already been ended`);
         }
-    } else{
-        throw new BadInputError(`Room with ID ${roomId} does not exist`);
+    } else if (!retrievedChatroom.moderators.includes(hostId)){
+        throw new Error(`Only room hosts can end the room`);
+    }
+    else{
+        throw new Error(`Room with ID ${roomId} does not exist`);
     }
 }
 

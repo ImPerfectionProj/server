@@ -33,6 +33,14 @@ const retrieveWithEmailPassword = async (email, password) => {
     return retrievedUser;
 };
 
+const retrieveWithUserIdPassword = async (userId, password) => {
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser || !retrievedUser.validPassword(password) ){
+        return null;
+    }
+    return retrievedUser;
+};
+
 const resetPassword = async(userId, password) => {
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
@@ -169,6 +177,7 @@ const applyForModerator = async(userId) => {
 module.exports = {
     createUser,
     retrieveWithEmailPassword,
+    retrieveWithUserIdPassword,
     resetPassword,
     changeUsername,
     changeTags,

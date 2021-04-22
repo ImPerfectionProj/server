@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema(
       salt: String,
       description: String,
       hash: String, // salted password
-      following_list: [String], // string of userId
+      following_list: { type : [String], default: [] }, // users who the user follows to
+      follower_list: { type : [String], default: [] }, // user's follower
       tags: [String], // string of tag names
       hosted_rooms: [String] // string of chatroomId
     },

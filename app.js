@@ -1,6 +1,7 @@
 
 const express = require('express');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const cors = require("cors");
 require('dotenv').config();
 
 const sanityCheckRouter = require('./routes/sanityCheck.router');
@@ -8,6 +9,7 @@ const sanityCheckRouter = require('./routes/sanityCheck.router');
 const authRouter = require('./routes/auth.router');
 const moderatorRouter = require('./routes/moderator.router');
 const roomRouter = require('./routes/room.router');
+const userRouter = require('./routes/user.router');
 
 
 
@@ -26,12 +28,13 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors());
 // routes
 app.use('/', sanityCheckRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/moderator', moderatorRouter);
 app.use('/api/room', roomRouter);
+app.use('/api/user', userRouter);
 
 
 

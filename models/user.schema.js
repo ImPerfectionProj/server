@@ -15,7 +15,8 @@ const userSchema = new mongoose.Schema(
       following_list: { type : [String], default: [] }, // users who the user follows to
       follower_list: { type : [String], default: [] }, // user's follower
       tags: [String], // string of tag names
-      hosted_rooms: [String] // string of chatroomId
+      hosted_rooms: [String], // string of chatroomId,
+      pwd_token: String
     },
     { timestamps: true },
 );

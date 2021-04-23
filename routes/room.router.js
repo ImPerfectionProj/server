@@ -7,6 +7,27 @@ const userModel = require('../models/user.schema');
 const roomService = require('../services/room.service');
 const moderatorService = require('../services/moderator.service');
 
+router.post('/create/:moderator_id', async (req,res) => {
+  const {moderator_id} = req.params;
+  const {name, topics, description} = req.body;
+  const isModerator = moderatorService.verifyIdentity(userId);
+  if (isModerator){
+    try{
+      const newRoomInstance = await roomService.createRoom(moderator_id, name, topics, description);
+      
+      res.status(200).json(newRoomInstance);
+    } catch(err){
+      res.status(400).json({
+        message: `Moderator ${moderator_id} to create a chat room`
+    });
+    }
+
+  }else{
+      res.status(400).json({
+          message: "User does not have room hosting permission"
+      });
+  }
+});
 
 router.get('/all_active_rooms', async (req,res) => {
     // [nice to have] sort the rooms
@@ -92,6 +113,82 @@ router.patch('/:roomId/endRoom', async (req,res) => {
       });
   }
 });
+
+router.patch('/:roomId/participant_list/:new_user_id/joinAnonymous', async (req,res) => {
+  const { roomId, new_user_id, } = req.params;
+  const anonymous = true;
+  try{
+      const confirmedRoom = await roomService.joinRoom(roomId, new_user_id,anonymous);
+      res.status(200).json({
+          roomId: confirmedRoom.roomId,
+          participants: confirmedRoom.participants,
+          active: confirmedRoom.active,
+          starttime: confirmedRoom.starttime
+        }); 
+  } catch(err){
+    console.log(err)
+    res.status(400).json({message: `Fail to join into Room ${roomId}`})
+  }
+});
+
+router.patch('/:roomId/participant_list/:new_user_id/join', async (req,res) => {
+  const { roomId, new_user_id, } = req.params;
+  const anonymous = false;
+  try{
+      const confirmedRoom = await roomService.joinRoom(roomId, new_user_id,anonymous);
+      res.status(200).json({
+          roomId: confirmedRoom.roomId,
+          participants: confirmedRoom.participants,
+          active: confirmedRoom.active,
+          starttime: confirmedRoom.starttime
+        }); 
+  } catch(err){
+    console.log(err)
+    res.status(400).json({message: `Fail to join into Room ${roomId}`})
+  }
+});
+
+router.patch('/:roomId/participant_list/:new_user_id/leave', async (req,res) => {
+  const { roomId, new_user_id} = req.params;
+  // console.log(userId);
+  // console.log(roomId);
+  // console.log(anonymous)
+  // const isParticipant = moderatorService.verifyParticipant(userId);
+  // if (isParticipant){
+  try{
+      const confirmedRoom = await roomService.leaveRoom(roomId, new_user_id);
+      res.status(200).json({
+          roomId: confirmedRoom.roomId,
+          participants: confirmedRoom.participants,
+          active: confirmedRoom.active,
+          starttime: confirmedRoom.starttime
+        }); 
+  } catch(err){
+    console.log(err)
+    res.status(400).json({message: `Fail to have user ${userId} leave Room ${roomId}`})
+  }
+
+});
+router.patch('/:roomId/remove', async (req,res) => {
+  const { moderator_id, participant_id} = req.body;
+  try{
+      const confirmedRoom = await roomService.remove_participant_by_host(roomId, moderator_id,
+        participant_id);
+      res.status(200).json({
+          roomId: confirmedRoom.roomId,
+          participants: confirmedRoom.participants,
+          active: confirmedRoom.active,
+          starttime: confirmedRoom.starttime
+        }); 
+  } catch(err){
+    console.log(err)
+    res.status(400).json({message: `Fail to have user ${userId} leave Room ${roomId}`})
+  }
+
+});
+
+
+
 
 
 // router.delete('/clear_room_participants/:roomId', async(req, res) =>{

@@ -168,9 +168,15 @@ const deleteFollow = async( userId, moderatorId) => {
     return {"follower":updatedUser, "moderator":updatedModerator};
 }
 
-const applyForModerator = async(userId) => {
+const changeRole = async (userId, newRole) => {
+    const retrievedUser = await UserModel.findOne({userId});
+    if (retrievedUser ){
+        retrievedUser.role = newRole;
+        const confirmedUser = retrievedUser.save()
+        return confirmedUser;
+    }
     return null;
-}
+};
 
 
 
@@ -187,7 +193,7 @@ module.exports = {
     changeDescription,
     addFollow,
     deleteFollow,
-    applyForModerator
+    changeRole
 
   };
 

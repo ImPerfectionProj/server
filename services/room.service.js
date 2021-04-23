@@ -61,43 +61,87 @@ const retrieve_With_RoomId_HostId = async (roomId, hostId) => {
 
 
 const joinRoom = async (roomId, userId, anonymous) => {
-
-    console.log(userId);
     const retrievedChatroom = await RoomModel.findOne({roomId});
     if (!retrievedChatroom || ! retrievedChatroom.active){
-        throw new Error(`Room with ID ${roomId} does not exist`);
+        throw new Error(`Room with ID ${roomId} is not active`);
     }
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
         throw new Error(`User with ID ${userId} does not exist`);
+    } else if (retrievedUser.role === "moderator"){
+        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
     }
 
-    const existParticipant = await RoomModel.findOne({roomId,"participants.userId":userId});
-    const existModerator = await RoomModel.findOne({roomId,"moderators":{$nin :[userId]}});
-    if (existParticipant || existModerator){
+    if (retrievedChatroom.participants.map(a=>a.userId).includes(userId)){
         console.log(`User with ID ${userId} already joined room `);
         return retrievedChatroom;
     }
-    RoomModel.updateOne({"roomId":roomId}, 
-            {$addToSet: {participants:{"userId":userId, 
-                                    "anonymous":anonymous,
-                                    "canSpeak":false}}})
-        .catch((err) => {
-            console.log('Error: ' + err);
-        });
-    const confirmdRoom = await RoomModel.findOne({roomId});
+    retrievedChatroom.participants.push({"userId":userId, 
+                                        "anonymous":anonymous,
+                                        "canSpeak":false})
+    // RoomModel.updateOne({"roomId":roomId}, 
+    //         {$push: {participants:{"userId":userId, 
+    //                                 "anonymous":anonymous,
+    //                                 "canSpeak":false}}})
+    //     .catch((err) => {
+    //         console.log('Error: ' + err);
+    //     });
+    
+    const confirmdRoom = await retrievedChatroom.save(); //RoomModel.findOne({roomId});
     return confirmdRoom
-    
-    
+  };
+
+
+const leaveRoom = async (roomId, userId) => {
+    const retrievedChatroom = await RoomModel.findOne({roomId});
+    if (!retrievedChatroom || ! retrievedChatroom.active){
+        throw new Error(`Room with ID ${roomId} is not active`);
+    }
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser){
+        throw new Error(`User with ID ${userId} does not exist`);
+    } else if (retrievedUser.role === "moderator"){
+        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
+    }
+
+    const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
+
+    if (index>=-1){
+        retrievedChatroom.participants.splice(index, 1);       
+    }
+
+    const confirmdRoom = await retrievedChatroom.save(); //RoomModel.findOne({roomId});
+    return confirmdRoom
   };
   
+  const remove_participant_by_host = async (roomId, hostId, userId) => {
+    const retrievedChatroom = await RoomModel.findOne({roomId, moderators: { "$in" : [hostId]}});
+    if (!retrievedChatroom || ! retrievedChatroom.active){
+        throw new Error(`Room with ID ${roomId} is not active or do not have moderator ${hostId}`);
+    }
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser){
+        throw new Error(`User with ID ${userId} does not exist`);
+    } else if (retrievedUser.role === "moderator"){
+        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
+    }
 
+    const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
+
+    if (index>=-1){
+        retrievedChatroom.participants.splice(index, 1);       
+    }
+
+    const confirmdRoom = await retrievedChatroom.save(); //RoomModel.findOne({roomId});
+    return confirmdRoom
+  };
 
 
 module.exports = {
     createRoom,
     endRoom,
     retrieve_With_RoomId_HostId,
-    joinRoom
+    joinRoom,
+    leaveRoom
 
   };

@@ -14,6 +14,7 @@ const createUser = async (password, name, email, phoneNumber) => {
 
     const userInstance = new UserModel({
         userId: uuid(),
+        role: "student",
         name, 
         email,
         phoneNumber

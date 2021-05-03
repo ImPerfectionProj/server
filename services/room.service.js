@@ -42,10 +42,10 @@ const endRoom = async(roomId, hostId) =>{
             // throw new  BadInputError(`Room with ID ${roomId} has already been ended`);
         }
     } else if (!retrievedChatroom.moderators.includes(hostId)){
-        throw new Error(`Only room hosts can end the room`);
+        throw new Error(`-32`);
     }
     else{
-        throw new Error(`Room with ID ${roomId} does not exist`);
+        throw new Error(`-30`);
     }
 }
 
@@ -63,13 +63,13 @@ const retrieve_With_RoomId_HostId = async (roomId, hostId) => {
 const joinRoom = async (roomId, userId, anonymous) => {
     const retrievedChatroom = await RoomModel.findOne({roomId});
     if (!retrievedChatroom || ! retrievedChatroom.active){
-        throw new Error(`Room with ID ${roomId} is not active`);
+        throw new Error(`-30`);
     }
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
-        throw new Error(`User with ID ${userId} does not exist`);
+        throw new Error(`-10`);
     } else if (retrievedUser.role === "moderator"){
-        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
+        throw new Error(`-33`);
     }
 
     if (retrievedChatroom.participants.map(a=>a.userId).includes(userId)){
@@ -79,14 +79,10 @@ const joinRoom = async (roomId, userId, anonymous) => {
     retrievedChatroom.participants.push({"userId":userId, 
                                         "anonymous":anonymous,
                                         "canSpeak":false})
-    // RoomModel.updateOne({"roomId":roomId}, 
-    //         {$push: {participants:{"userId":userId, 
-    //                                 "anonymous":anonymous,
-    //                                 "canSpeak":false}}})
-    //     .catch((err) => {
-    //         console.log('Error: ' + err);
-    //     });
-    
+    if (retrievedChatroom.participants.length > retrievedChatroom.historical_max){
+        retrievedChatroom.historical_max=retrievedChatroom.participants.length;
+    }
+
     const confirmdRoom = await retrievedChatroom.save(); //RoomModel.findOne({roomId});
     return confirmdRoom
   };
@@ -95,14 +91,12 @@ const joinRoom = async (roomId, userId, anonymous) => {
 const leaveRoom = async (roomId, userId) => {
     const retrievedChatroom = await RoomModel.findOne({roomId});
     if (!retrievedChatroom || ! retrievedChatroom.active){
-        throw new Error(`Room with ID ${roomId} is not active`);
+        throw new Error(`-30`);
     }
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
-        throw new Error(`User with ID ${userId} does not exist`);
-    } else if (retrievedUser.role === "moderator"){
-        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
-    }
+        throw new Error(`-10`);
+    } 
 
     const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
 
@@ -116,15 +110,18 @@ const leaveRoom = async (roomId, userId) => {
   
   const remove_participant_by_host = async (roomId, hostId, userId) => {
     const retrievedChatroom = await RoomModel.findOne({roomId, moderators: { "$in" : [hostId]}});
-    if (!retrievedChatroom || ! retrievedChatroom.active){
-        throw new Error(`Room with ID ${roomId} is not active or do not have moderator ${hostId}`);
+    if (!retrievedChatroom ){
+        throw new Error(`-30`);
     }
+    if (!retrievedChatroom.active){
+        throw new Error(`-35`);
+    }
+    
+    
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
-        throw new Error(`User with ID ${userId} does not exist`);
-    } else if (retrievedUser.role === "moderator"){
-        throw new Error(`User with ID ${userId} is a moderator and can not join chatrooms.`);
-    }
+        throw new Error(`-10`);
+    } 
 
     const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
 
@@ -142,6 +139,7 @@ module.exports = {
     endRoom,
     retrieve_With_RoomId_HostId,
     joinRoom,
-    leaveRoom
+    leaveRoom,
+    remove_participant_by_host
 
   };

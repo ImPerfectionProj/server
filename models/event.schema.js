@@ -3,8 +3,13 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema(
     {
       eventId: String,
+      moderatorId: String,
       title: String,
-      pictureUrl: String
+      pictureUrl: String,
+      description: String,
+      starttime: Date,
+      endtime: Date
+
     },
     { timestamps: true },
 );

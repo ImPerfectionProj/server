@@ -11,7 +11,8 @@ const chatroomSchema = new mongoose.Schema(
       participants: [],
       active: { type : Boolean, default: true },
       starttime: { type : Date, default: Date.now },
-      endtime: Date
+      endtime: Date,
+      historical_max: {type: Number, default: 0}
     },
     { timestamps: true },
 );

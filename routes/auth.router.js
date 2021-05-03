@@ -17,6 +17,8 @@ router.post('/signin', async (req, res) => {
   const retrievedUser = await userService.retrieveWithEmailPassword(email, password);
   if (retrievedUser){
     res.status(200).json({
+      result_code: 110,
+      message: "User logged in successfully.",
       name: retrievedUser.name,
       profilePic: retrievedUser.profilePic,
       role: retrievedUser.role,
@@ -24,6 +26,7 @@ router.post('/signin', async (req, res) => {
     });
   }else{
     res.status(400).json({
+      result_code: -10,
       message: "User not found"
     });
   }
@@ -31,20 +34,25 @@ router.post('/signin', async (req, res) => {
 
 router.post('/signup', async (req,res) => {
   let { password, name, email, phoneNumber} = req.body;
+  console.log('signup');
   
   try{
     const newUserInstance = await userService.createUser(password, name, email, phoneNumber);
     res.status(200).json({
+      "result_code": 111,
+      "message": "User signed up successfully",
       name: newUserInstance.name,
       email: newUserInstance.email,
       phoneNumber: newUserInstance.phoneNumber,
+      userId: newUserInstance.userId
     });
   }catch (e){
     // if (e instanceof BadInputError){
     // } else if (e instanceof StatusCodeError){
     // }
     res.status(400).json({
-      message: "signup error"
+      result_code: -11,
+      message: "Sign up error"
     })
   }  
 });
@@ -52,25 +60,32 @@ router.post('/signup', async (req,res) => {
 
 
 router.patch('/signup-addition', async (req, res) => {
-  const { profilePic, tags, email, password } = req.body;
+  const { profilePic, mental_tags, custom_tags, userId } = req.body;
   console.log('adding avatar and tags');
   // fetch user
-  const retrievedUser = await userService.retrieveWithEmailPassword(email, password);
+  const retrievedUser = await UserModel.findOne({userId});
   if (retrievedUser){
     if (profilePic){
       retrievedUser.profilePic = profilePic;
     }
-    if (tags){
-      retrievedUser.tags = tags;
+    if (mental_tags){
+      retrievedUser.mental_tags = mental_tags;
+    }
+    if (custom_tags){
+      retrievedUser.custom_tags = custom_tags;
     }
     await retrievedUser.save();
     res.status(200).json({
-      name: retrievedUser.name,
+      result_code : 112,
+      message: "User tags and profile picture added.",
+      userId: retrievedUser.userId,
       profilePic: retrievedUser.profilePic,
-      tags: retrievedUser.tags,
+      mental_tags: retrievedUser.mental_tags,
+      custom_tags: retrievedUser.custom_tags,
     });
   }else{
     res.status(400).json({
+      result_code : -11,
       message: "User not found"
     })
   }
@@ -87,10 +102,13 @@ router.patch('/reset_password/:userId', async (req, res) => {
       .toString(`hex`);
     await retrievedUser.save();
     res.status(200).json({
-      retrievedUser
+      "result_code": 113,
+      "message": "User password updated successfully."
+
     });
   }else{
     res.status(400).json({
+      "result_code": -10,
       message: "User not found"
     })
   }
@@ -122,18 +140,24 @@ router.post('/forget_password', async (req, res) => {
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           console.log(error);
-          res.status(400).json({message:`Fail to send to Email ${email}.`,
+          res.status(400).json({
+            result_code: -20,
+            message:`Fail to send to Email ${email}.`,
         reset_token:confirmedUser.pwd_token});
         } else {
           console.log('Email sent: ' + info.response);
-          res.status(200).json({message:"Reset token sent to Email Address."});
+          res.status(200).json({
+            result_code: 120,
+            message:"Reset token sent to Email Address."});
         }
       })
       
       
     } else {
-      console.log("Invalid Email Address.")
-      res.status(200).json({message:"Invalid Email Address."});
+      console.log("User not found with given email.")
+      res.status(400).json({
+        result_code: -10,
+        message:"User not found."});
     }
   // } 
   // catch(err){
@@ -155,20 +179,26 @@ router.patch('/forget_password/reset', async (req, res) => {
         .toString(`hex`);
         await retrievedUser.save();
         res.status(200).json({
+          result_code: 121,
           message:`Reset password successfully for user with email ${email}`
         });
       } else{
         res.status(200).json({
-          message:`Fail to reset password. Reset token is incorrect.`})
+          result_code: 122,
+          message:`Reset token is incorrect.`})
       }
   
     } else {
       console.log("Invalid Email Address.")
-      res.status(200).json({message:"Invalid Email Address."});
+      res.status(400).json({
+        result_code: -10,
+        message:"User not found."});
     }
   } catch(err){
     console.log(err);
-    res.status(400).json({message:'Cannot connect to MongoDB'});
+    res.status(200).json({
+      result_code: 123,
+      message:'Fail to reset password.'});
   }
 });
 

@@ -7,15 +7,17 @@ const userSchema = new mongoose.Schema(
       name: String,
       email: String,
       phoneNumber: String,
-      role: String,
+      role: String,//{ type : String, default: 'student' },
       profilePic: String,
       salt: String,
       description: String,
       hash: String, // salted password
       following_list: { type : [String], default: [] }, // users who the user follows to
       follower_list: { type : [String], default: [] }, // user's follower
-      tags: [String], // string of tag names
-      hosted_rooms: [String], // string of chatroomId,
+      mental_tags: [String], // string of tag names,
+      custom_tags: [String],
+      hosted_rooms: { type : [String], default: [] }, // string of chatroomId,
+      linkedIn: String,
       pwd_token: String
     },
     { timestamps: true },

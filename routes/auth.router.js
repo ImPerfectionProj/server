@@ -13,7 +13,7 @@ router.post('/signin', async (req, res) => {
 
   console.log('signin with email');
 
-  // fetch user
+  // fetch user from database
   const retrievedUser = await userService.retrieveWithEmailPassword(email, password);
   if (retrievedUser){
     res.status(200).json({

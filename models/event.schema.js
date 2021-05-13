@@ -5,7 +5,7 @@ const eventSchema = new mongoose.Schema(
       eventId: String,
       moderatorId: String,
       title: String,
-      pictureUrl: String,
+      posterImage: Object,
       description: String,
       starttime: Date,
       endtime: Date

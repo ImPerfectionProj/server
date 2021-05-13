@@ -232,7 +232,7 @@ router.post('/avatar/:userId', async (req,res) => {
                 avatarName: userInstance.avatar.name,
                 mimetype: userInstance.avatar.mimetype
             });
-        }catch (e){
+        } catch (e) {
             res.status(400).json({
                 result_code: -10,
                 message: "User not found"

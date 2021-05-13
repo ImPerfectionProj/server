@@ -61,7 +61,7 @@ router.get('/:userId', async (req,res) => {
 router.patch('/:userId/profile', async (req,res) => {
     console.log("update profile")
     const {userId} = req.params;
-    const {name, email,phoneNumber,profilePic,description,
+    const {username, email,phoneNumber,profilePic,description,
         mental_tags,custom_tags,linkedIn} = req.body;
     try{ 
         const userInstance = await UserModel.findOne({ userId:userId });
@@ -69,7 +69,7 @@ router.patch('/:userId/profile', async (req,res) => {
             result_code : -10,
             message: "User not found"
         });} else{
-        if (name){userInstance.name = name;}
+        if (username){userInstance.username = username;}
         if (email){userInstance.email = email;}
         if (phoneNumber){userInstance.phoneNumber = phoneNumber;}
         if (profilePic){userInstance.profilePic = profilePic;}

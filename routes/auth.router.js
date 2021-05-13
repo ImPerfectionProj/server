@@ -31,7 +31,7 @@ router.post('/signup', async (req,res) => {
       phoneNumber: newUserInstance.phoneNumber,
       userId: newUserInstance.userId
     });
-  }catch (e){
+  } catch (e) {
     // if (e instanceof BadInputError){
     // } else if (e instanceof StatusCodeError){
     // }
@@ -67,14 +67,11 @@ router.post('/signin', async (req, res) => {
 });
 
 router.patch('/signup-addition', async (req, res) => {
-  const { profilePic, mental_tags, custom_tags, userId } = req.body;
+  const { mental_tags, custom_tags, userId } = req.body;
   console.log('adding avatar and tags');
   // fetch user
   const retrievedUser = await UserModel.findOne({userId});
   if (retrievedUser){
-    if (profilePic){
-      retrievedUser.profilePic = profilePic;
-    }
     if (mental_tags){
       retrievedUser.mental_tags = mental_tags;
     }
@@ -86,7 +83,6 @@ router.patch('/signup-addition', async (req, res) => {
       result_code : 112,
       message: "User tags and profile picture added.",
       userId: retrievedUser.userId,
-      profilePic: retrievedUser.profilePic,
       mental_tags: retrievedUser.mental_tags,
       custom_tags: retrievedUser.custom_tags,
     });

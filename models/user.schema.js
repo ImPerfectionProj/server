@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const userSchema = new mongoose.Schema(
     {
       userId: String,
-      name: String,
+      username: String,
       email: String,
       phoneNumber: String,
       role: String,//{ type : String, default: 'student' },
@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
       custom_tags: [String],
       hosted_rooms: { type : [String], default: [] }, // string of chatroomId,
       linkedIn: String,
-      pwd_token: String
+      pwd_token: String,
+      avatar: Object
     },
     { timestamps: true },
 );

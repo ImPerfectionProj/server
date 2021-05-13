@@ -3,7 +3,7 @@ const RoomModel = require('../models/room.schema');
 const { v4: uuid } = require('uuid');
 
 
-const createRoom = async (userId, name, topics, description) => {
+const createRoom = async (userId, moderatorName, name, topics, description) => {
     // create room instance
     // add roomId to host(userId)'s hosted_rooms
 
@@ -15,11 +15,11 @@ const createRoom = async (userId, name, topics, description) => {
     // console.log("here")
 
     const roomInstance = new RoomModel({
-        roomId: uuid(),
+        roomId: uuid().substring(0,6),
         name, 
         topics,
         description,
-        moderators: [userId],
+        moderators: [{userId, moderatorName}],
         participants: []
     });
     const confirmdRoom = await roomInstance.save();

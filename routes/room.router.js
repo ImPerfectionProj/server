@@ -14,7 +14,7 @@ router.post('/create/:moderator_id', async (req,res) => {
   const moderator = await userModel.findOne({userId: moderator_id, role:"moderator"});
   if (moderator){
     try{
-      const newRoomInstance = await roomService.createRoom(moderator_id, name, topics, description);
+      const newRoomInstance = await roomService.createRoom(moderator_id, moderator.name, name, topics, description);
       
       // console.log(moderator.hosted_rooms);
       if (moderator.hosted_rooms){
@@ -46,18 +46,20 @@ router.post('/create/:moderator_id', async (req,res) => {
 router.get('/all_active_rooms', async (req,res) => {
     // [nice to have] sort the rooms
     //  get all active rooms from the database
-    try{const activeRooms = await RoomModel.find({ active: true });
-    res.status(200).json({
-      result_code : 200,
-      message: "Successfully retrieve active chat room list successfully.",
-      rooms: activeRooms
-      }); }catch(err){
-        console.log(err.message);
-        res.status(200).json({
-          result_code : 201,
-          message: "Fail to retrieve active chat room."
-        });
-      }
+    try{
+      const activeRooms = await RoomModel.find({ active: true });
+      res.status(200).json({
+        result_code : 200,
+        message: "Successfully retrieve active chat room list successfully.",
+        rooms: activeRooms
+      }); 
+    }catch(err){
+      console.log(err.message);
+      res.status(200).json({
+        result_code : 201,
+        message: "Fail to retrieve active chat room."
+      });
+    }
 });
 
 router.get('/rooms_hosted_by_moderator/:moderator_userId', async (req,res) => {

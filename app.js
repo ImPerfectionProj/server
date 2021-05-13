@@ -2,6 +2,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require("cors");
+const fileUpload = require('express-fileupload');
+
 require('dotenv').config();
 
 const sanityCheckRouter = require('./routes/sanityCheck.router');
@@ -10,7 +12,7 @@ const authRouter = require('./routes/auth.router');
 const moderatorRouter = require('./routes/moderator.router');
 const roomRouter = require('./routes/room.router');
 const userRouter = require('./routes/user.router');
-
+const eventRouter = require('./routes/event.router');
 
 
 const app = express();
@@ -29,12 +31,18 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+}));
+
 // routes
 app.use('/', sanityCheckRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/moderator', moderatorRouter);
 app.use('/api/room', roomRouter);
 app.use('/api/user', userRouter);
+app.use('/api/event', eventRouter);
 
 
 

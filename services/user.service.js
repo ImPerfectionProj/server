@@ -1,10 +1,10 @@
 const UserModel = require('../models/user.schema');
 const { v4: uuid } = require('uuid');
 
-const createUser = async (password, name, email, phoneNumber) => {
-    if (!password || !name || !email || !phoneNumber){
-        console.log(password, name, email, phoneNumber);
-        throw new BadInputError(`missing parameters: ${password} ${name} ${email} ${phoneNumber}`);
+const createUser = async (password, username, email, phoneNumber) => {
+    if (!password || !username || !email || !phoneNumber){
+        console.log(password, username, email, phoneNumber);
+        throw new BadInputError(`missing parameters: ${password} ${username} ${email} ${phoneNumber}`);
     }
 
     const checkDup = await UserModel.findOne({ email });
@@ -12,12 +12,14 @@ const createUser = async (password, name, email, phoneNumber) => {
         throw new StatusCodeError(400, 'User already has an account');
     }
 
+    // TODO: use avatar_path
+
     const userInstance = new UserModel({
         userId: uuid(),
         role: "student",
-        name, 
+        username, 
         email,
-        phoneNumber
+        phoneNumber,
     });
 
     userInstance.setPassword(password);
@@ -57,7 +59,7 @@ const changeUsername = async( userId, userName) => {
     if (!retrievedUser){
         return null;
     }
-    retrievedUser.name = userName;
+    retrievedUser.username = userName;
     const confirmedUser = await retrievedUser.save();
     return confirmedUser;
 }
@@ -108,6 +110,16 @@ const changeDescription = async( userId, description) => {
         return null;
     }
     retrievedUser.description = description;
+    const confirmedUser = await retrievedUser.save();
+    return confirmedUser;
+}
+
+const uploadAvatar = async( userId, avatar) => {
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser){
+        return null;
+    }
+    retrievedUser.avatar = avatar;
     const confirmedUser = await retrievedUser.save();
     return confirmedUser;
 }
@@ -179,6 +191,13 @@ const changeRole = async (userId, newRole) => {
     return null;
 };
 
+const getAvatar = async (userId) => {
+    const retrievedUser = await UserModel.findOne({userId});
+    if (retrievedUser ){
+        return retrievedUser.avatar;
+    }
+    return null;
+};
 
 
 module.exports = {
@@ -194,7 +213,9 @@ module.exports = {
     changeDescription,
     addFollow,
     deleteFollow,
-    changeRole
+    changeRole,
+    getAvatar,
+    uploadAvatar
 
   };
 

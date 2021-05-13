@@ -7,7 +7,7 @@ const chatroomSchema = new mongoose.Schema(
       name: String,
       topics: [String],
       description: String,
-      moderators: [String],
+      moderators: [Object],
       participants: [],
       active: { type : Boolean, default: true },
       starttime: { type : Date, default: Date.now },

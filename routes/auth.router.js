@@ -8,40 +8,25 @@ const nodemailer = require("nodemailer");
 require('dotenv').config();
 
 
-router.post('/signin', async (req, res) => {
-  const { email, password } = req.body;
 
-  console.log('signin with email');
 
-  // fetch user from database
-  const retrievedUser = await userService.retrieveWithEmailPassword(email, password);
-  if (retrievedUser){
-    res.status(200).json({
-      result_code: 110,
-      message: "User logged in successfully.",
-      name: retrievedUser.name,
-      profilePic: retrievedUser.profilePic,
-      role: retrievedUser.role,
-      userId: retrievedUser.userId
-    });
-  }else{
-    res.status(400).json({
-      result_code: -10,
-      message: "User not found"
-    });
-  }
-});
+
+
 
 router.post('/signup', async (req,res) => {
-  let { password, name, email, phoneNumber} = req.body;
+
+
+
+  let { password, username, email, phoneNumber} = req.body;
   console.log('signup');
-  
+
+
   try{
-    const newUserInstance = await userService.createUser(password, name, email, phoneNumber);
+    const newUserInstance = await userService.createUser(password, username, email, phoneNumber);
     res.status(200).json({
       "result_code": 111,
       "message": "User signed up successfully",
-      name: newUserInstance.name,
+      username: newUserInstance.username,
       email: newUserInstance.email,
       phoneNumber: newUserInstance.phoneNumber,
       userId: newUserInstance.userId
@@ -57,7 +42,29 @@ router.post('/signup', async (req,res) => {
   }  
 });
 
+router.post('/signin', async (req, res) => {
+  const { email, password } = req.body;
 
+  console.log('signin with email');
+
+  // fetch user from database
+  const retrievedUser = await userService.retrieveWithEmailPassword(email, password);
+  if (retrievedUser){
+    res.status(200).json({
+      result_code: 110,
+      message: "User logged in successfully.",
+      username: retrievedUser.username,
+      profilePic: retrievedUser.profilePic,
+      role: retrievedUser.role,
+      userId: retrievedUser.userId
+    });
+  }else{
+    res.status(400).json({
+      result_code: -10,
+      message: "User not found"
+    });
+  }
+});
 
 router.patch('/signup-addition', async (req, res) => {
   const { profilePic, mental_tags, custom_tags, userId } = req.body;
@@ -208,7 +215,7 @@ router.patch('/changeRole', async (req,res) => {
   try{
     const newUserInstance = await userService.changeRole(userId, newRole);
     res.status(200).json({
-      name: newUserInstance.name,
+      username: newUserInstance.username,
       userId: newUserInstance.userId,
       role: newUserInstance.role,
     });

@@ -68,11 +68,13 @@ router.get('/rooms_hosted_by_moderator/:moderator_userId', async (req,res) => {
     const moderatorInstance = await userModel.findOne({ userId: moderator_userId, role:"moderator" });
     if (moderatorInstance){
       const hosted_rooms = moderatorInstance.hosted_rooms;
+      const rooms = await roomService.retrievedRooms(hosted_rooms);
+
       res.status(200).json({
         result_code: 215,
         message:  "Successfully get all chat rooms hosted by moderator.",
         moderatorId:  moderator_userId,
-        room_ids: hosted_rooms
+        rooms: rooms
       }); 
     }
     else{

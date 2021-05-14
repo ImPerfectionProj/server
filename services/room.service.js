@@ -49,15 +49,6 @@ const endRoom = async(roomId, hostId) =>{
     }
 }
 
-const retrieve_With_RoomId_HostId = async (roomId, hostId) => {
-    // retrieve roomInstance
-    // check if the user 
-    const retrievedChatroom = await RoomModel.findOne({roomId});
-    if (!retrievedChatroom || !retrievedChatroom.moderators.includes(hostId)){
-        return null;
-    }
-    return retrievedChatroom;
-};
 
 
 const joinRoom = async (roomId, userId, anonymous) => {
@@ -133,6 +124,27 @@ const leaveRoom = async (roomId, userId) => {
     return confirmdRoom
   };
 
+const retrieve_With_RoomId_HostId = async (roomId, hostId) => {
+    // retrieve roomInstance
+    // check if the user 
+    const retrievedChatroom = await RoomModel.findOne({roomId});
+    if (!retrievedChatroom || !retrievedChatroom.moderators.includes(hostId)){
+        return null;
+    }
+    return retrievedChatroom;
+};
+
+const retrievedRooms = async (hosted_rooms) => {
+    // retrieve roomInstance
+    // check if the user 
+    const rooms = await RoomModel.find({roomId: {$in: hosted_rooms}});
+    if (!rooms){
+        return [];
+    }
+    return rooms;
+};
+
+
 
 module.exports = {
     createRoom,
@@ -140,6 +152,6 @@ module.exports = {
     retrieve_With_RoomId_HostId,
     joinRoom,
     leaveRoom,
-    remove_participant_by_host
-
+    remove_participant_by_host,
+    retrievedRooms
   };

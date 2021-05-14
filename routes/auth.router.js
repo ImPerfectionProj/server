@@ -29,7 +29,8 @@ router.post('/signup', async (req,res) => {
       username: newUserInstance.username,
       email: newUserInstance.email,
       phoneNumber: newUserInstance.phoneNumber,
-      userId: newUserInstance.userId
+      userId: newUserInstance.userId,
+      role: newUserInstance.role
     });
   } catch (e) {
     // if (e instanceof BadInputError){

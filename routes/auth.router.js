@@ -54,10 +54,7 @@ router.post('/signin', async (req, res) => {
     res.status(200).json({
       result_code: 110,
       message: "User logged in successfully.",
-      username: retrievedUser.username,
-      profilePic: retrievedUser.profilePic,
-      role: retrievedUser.role,
-      userId: retrievedUser.userId
+      user: retrievedUser
     });
   }else{
     res.status(400).json({

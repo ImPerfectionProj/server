@@ -29,16 +29,7 @@ router.get('/:userId', async (req,res) => {
             res.status(200).json({
                 result_code: 152,
                 message: "Successfully get profile information of userId.",
-                userId: userId,
-                role: user.role,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                profilePic: user.profilePic,
-                description: user.description,
-                mental_tags: user.mental_tags,
-                custom_tags: user.custom_tags,
-                linkedIn: user.linkedIn,
+                user
 
             });
         }

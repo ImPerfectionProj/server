@@ -102,19 +102,23 @@ router.get('/:roomId/info', async (req,res) => {
   try{
   const activeRooms = await RoomModel.findOne({ roomId });
   if (activeRooms && activeRooms.active){
+    // console.log("inside");
     let moderators = activeRooms.moderators;
       
       for (const i in moderators){
-        let moderator_name = userService.getName(moderators[i]);
-        let moderator_avatar = userService.getAvatar(moderators[i]);
+        let moderator_name = await userService.getName(moderators[i]);
+        let moderator_avatar = await userService.getAvatar(moderators[i]);
         moderator_list.push({"moderator_name":moderator_name,
         "moderator_avatar":moderator_avatar});
       }
       const participants = activeRooms.participants;
       for (const index in participants){
         let participant = participants[index];
-        let name = userService.getName(participant.userId);
-        let avatar = userService.getAvatar(participant.userId);
+        console.log(participant)
+        let name = await userService.getName(participant.userId);
+        console.log(name);
+        let avatar = await userService.getAvatar(participant.userId);
+        console.log(avatar);
         if (name!==null){
           participant_list.push({
             "name": name, 

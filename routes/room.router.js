@@ -96,14 +96,45 @@ router.get('/rooms_hosted_by_moderator/:moderator_userId', async (req,res) => {
 
 router.get('/:roomId/info', async (req,res) => {
   const { roomId } = req.params;
-  const { userId } = req.body;
+  // const { userId } = req.body;
+  let participant_list = [];
+  let moderator_list = [];
   try{
   const activeRooms = await RoomModel.findOne({ roomId });
-  if (activeRooms && activeRooms.active && (activeRooms.moderators.includes(userId)||activeRooms.participants.includes(userId))){
+  if (activeRooms && activeRooms.active){
+    let moderators = activeRooms.moderators;
+      
+      for (const i in moderators){
+        let moderator_name = userService.getName(moderators[i]);
+        let moderator_avatar = userService.getAvatar(moderators[i]);
+        moderator_list.push({"moderator_name":moderator_name,
+        "moderator_avatar":moderator_avatar});
+      }
+      const participants = activeRooms.participants;
+      for (const index in participants){
+        let participant = participants[index];
+        let name = userService.getName(participant.userId);
+        let avatar = userService.getAvatar(participant.userId);
+        if (name!==null){
+          participant_list.push({
+            "name": name, 
+            "avatar":avatar,
+            "anonymous":participant.anonymous,
+            "canSpeak":participant.canSpeak})
+        } else{
+          participant_list.push({
+            "name": "Anonymous", 
+            "avatar":avatar,
+            "anonymous":participant.anonymous,
+            "canSpeak":participant.canSpeak})
+        }
+      }
     res.status(200).json({
       result_code: 220,
       message: "Successfully view the room detail.",
-      room: activeRooms
+      room: activeRooms,
+      participant_list:participant_list,
+      moderator_list:moderator_list
     }); 
   }else if (activeRooms){
     res.status(200).json({

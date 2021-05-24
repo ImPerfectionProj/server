@@ -44,6 +44,15 @@ const retrieveWithUserIdPassword = async (userId, password) => {
     return retrievedUser;
 };
 
+const getName = async (userId) => {
+    const retrievedUser = await UserModel.findOne({userId});
+    if (!retrievedUser ){
+        return null;
+    }
+    return retrievedUser.userName;
+};
+
+
 const resetPassword = async(userId, password) => {
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
@@ -215,7 +224,8 @@ module.exports = {
     deleteFollow,
     changeRole,
     getAvatar,
-    uploadAvatar
+    uploadAvatar,
+    getName
 
   };
 

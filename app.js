@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(fileUpload({
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 },
 }));
 
 // routes

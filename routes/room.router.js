@@ -12,9 +12,9 @@ router.post('/create/:moderator_id', async (req,res) => {
   const {moderator_id} = req.params;
   const {name, topics, description} = req.body;
   const moderator = await userModel.findOne({userId: moderator_id, role:"moderator"});
-  if (moderator){
+  if (moderator!==null){
     try{
-      const newRoomInstance = await roomService.createRoom(moderator_id, moderator.name, name, topics, description);
+      const newRoomInstance = await roomService.createRoom(moderator_id, moderator.username, name, topics, description);
       
       // console.log(moderator.hosted_rooms);
       if (moderator.hosted_rooms){

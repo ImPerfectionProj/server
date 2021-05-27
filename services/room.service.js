@@ -12,7 +12,7 @@ const createRoom = async (userId, moderatorName, name, topics, description) => {
         throw new BadInputError(`missing parameters: ${userId} ${name} ${topics} ${description}`);
     }
 
-    // console.log("here")
+    console.log(moderatorName)
 
     const roomInstance = new RoomModel({
         roomId: uuid().substring(0,6),

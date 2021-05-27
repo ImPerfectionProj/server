@@ -45,6 +45,7 @@ const endRoom = async(roomId, hostId) =>{
         if (retrievedChatroom.active){
             retrievedChatroom.endtime = Date.now() ;
             retrievedChatroom.active = false;
+            retrievedChatroom.duration = (retrievedChatroom.endtime - retrievedChatroom.starttime)/ 1000 / 60
             const confirmdRoom = await retrievedChatroom.save();
             return confirmdRoom;
         } else {

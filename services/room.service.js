@@ -28,20 +28,31 @@ const createRoom = async (userId, moderatorName, name, topics, description) => {
 
 const endRoom = async(roomId, hostId) =>{
     const retrievedChatroom = await RoomModel.findOne({roomId});
+
+    const findHost = (uId, roomIns) => {
+        for (let i=0; i<roomIns.moderators.length; i++){
+            if (roomIns.moderators[i].userId===uId){
+                return true;
+            }
+        }
+        return false;
+    } 
+
     console.log(roomId)
-    console.log(retrievedChatroom)
-    if (retrievedChatroom && retrievedChatroom.moderators.includes(hostId)){
+    console.log(retrievedChatroom.moderators.includes({userId: hostId}))
+    // if (retrievedChatroom && retrievedChatroom.moderators.includes({userId: hostId})){
+    if (retrievedChatroom && findHost(hostId, retrievedChatroom)) {
         if (retrievedChatroom.active){
-        retrievedChatroom.endtime = Date.now() ;
-        retrievedChatroom.active = false;
-        const confirmdRoom = await retrievedChatroom.save();
-        return confirmdRoom;
+            retrievedChatroom.endtime = Date.now() ;
+            retrievedChatroom.active = false;
+            const confirmdRoom = await retrievedChatroom.save();
+            return confirmdRoom;
         } else {
             console.log('Room with ID ${roomId} has already been ended')
             return retrievedChatroom;
             // throw new  BadInputError(`Room with ID ${roomId} has already been ended`);
         }
-    } else if (!retrievedChatroom.moderators.includes(hostId)){
+    } else if (!retrievedChatroom.moderators.includes({userId: hostId})){
         throw new Error(`-32`);
     }
     else{

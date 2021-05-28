@@ -48,10 +48,32 @@ router.get('/all_active_rooms', async (req,res) => {
     //  get all active rooms from the database
     try{
       const activeRooms = await RoomModel.find({ active: true });
+      let resultRooms = [];
+      for (const k in activeRooms){
+        let activeRoom = activeRooms[k];
+
+        let newroom = {};
+        let moderators = activeRoom.moderators;
+        newroom["moderator_name"] = await userService.getName(moderators[0].userId);
+        newroom["moderator_avatar"] = await userService.getAvatar(moderators[0].userId);
+
+        newroom["topics"] = activeRoom["topics"];
+        newroom["description"] = activeRoom["description"];
+        newroom["name"] = activeRoom["name"];
+        newroom["roomId"] = activeRoom["roomId"];
+        newroom["historical_max"] = activeRoom["historical_max"];
+        newroom["starttime"] = activeRoom["starttime"];
+        newroom["createdAt"] = activeRoom["createdAt"];
+        newroom["updatedAt"] = activeRoom["updatedAt"];
+        newroom["participants"] = activeRoom["participants"];
+        newroom["moderator_id"] = activeRoom["moderators"][0].userId;
+
+        resultRooms.push(newroom);
+      }
       res.status(200).json({
         result_code : 200,
         message: "Successfully retrieve active chat room list successfully.",
-        rooms: activeRooms
+        rooms: resultRooms
       }); 
     }catch(err){
       console.log(err.message);

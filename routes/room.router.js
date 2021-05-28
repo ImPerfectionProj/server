@@ -101,37 +101,37 @@ router.get('/:roomId/info', async (req,res) => {
   let moderator_list = [];
   try{
   const activeRooms = await RoomModel.findOne({ roomId });
+  console.log(activeRooms)
   if (activeRooms && activeRooms.active){
     // console.log("inside");
     let moderators = activeRooms.moderators;
-      
-      for (const i in moderators){
-        let moderator_name = await userService.getName(moderators[i]);
-        let moderator_avatar = await userService.getAvatar(moderators[i]);
-        moderator_list.push({"moderator_name":moderator_name,
-        "moderator_avatar":moderator_avatar});
+    console.log("moderator");
+    for (const i in moderators){
+      let moderator_name = await userService.getName(moderators[i].userId);
+      let moderator_avatar = await userService.getAvatar(moderators[i].userId);
+      moderator_list.push({"moderator_name":moderator_name,
+      "moderator_avatar":moderator_avatar});
+    }
+    console.log("participant");
+    let participants = activeRooms.participants;
+    console.log("participants:"+participants);
+    for (const index in participants){
+      let participant = participants[index];
+      let name = await userService.getName(participant.userId);
+      let avatar = await userService.getAvatar(participant.userId);
+      if (name!==null){
+        participant_list.push({
+          "name": name, 
+          "avatar":avatar,
+          "anonymous":participant.anonymous,
+          "canSpeak":participant.canSpeak})
+      } else{
+        participant_list.push({
+          "name": "Anonymous", 
+          "avatar":avatar,
+          "anonymous":participant.anonymous,
+          "canSpeak":participant.canSpeak})
       }
-      const participants = activeRooms.participants;
-      for (const index in participants){
-        let participant = participants[index];
-        console.log(participant)
-        let name = await userService.getName(participant.userId);
-        console.log(name);
-        let avatar = await userService.getAvatar(participant.userId);
-        console.log(avatar);
-        if (name!==null){
-          participant_list.push({
-            "name": name, 
-            "avatar":avatar,
-            "anonymous":participant.anonymous,
-            "canSpeak":participant.canSpeak})
-        } else{
-          participant_list.push({
-            "name": "Anonymous", 
-            "avatar":avatar,
-            "anonymous":participant.anonymous,
-            "canSpeak":participant.canSpeak})
-        }
       }
     res.status(200).json({
       result_code: 220,

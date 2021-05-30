@@ -29,7 +29,18 @@ router.get('/:userId', async (req,res) => {
             res.status(200).json({
                 result_code: 152,
                 message: "Successfully get profile information of userId.",
-                user
+                userId: userId,
+                role: user.role,
+                name: user.username,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                profilePic: user.profilePic,
+                description: user.description,
+                mental_tags: user.mental_tags,
+                custom_tags: user.custom_tags,
+                linkedIn: user.linkedIn,
+                following_list: user.following_list,
+                follower_list: user.follower_list
 
             });
         }
@@ -84,15 +95,28 @@ router.patch('/:userId/profile', async (req,res) => {
     }
 })
 
-router.get('/:userId/followers', async (req,res) => {
+router.get('/:userId/followings', async (req,res) => {
     const { userId } = req.params;
+    console.log("followings:"+userId);
     try{
         const userInstance = await UserModel.findOne({ userId });
         if (userInstance){
+            let following_list = []
+            console.log("userInstance found");
+            for (const i in userInstance.following_list){
+                let following_info = {};
+                let following_id = userInstance.following_list[i];
+                following_info["name"] = await userService.getName(following_id);
+                following_info["avatar"] = await userService.getAvatar(following_id);
+                following_info["following_id"]=following_id;
+                console.log(following_info);
+                following_list.push(following_info);
+
+            }
             res.status(200).json({
                 result_code: 160,
-                message: "Successfully get the follower/following list.",
-                follower_list: userInstance.follower_list
+                message: "Successfully get the following list.",
+                following_list: following_list
             }); 
         }else{
             res.status(400).json({
@@ -104,19 +128,57 @@ router.get('/:userId/followers', async (req,res) => {
         console.log(err);
         res.status(200).json({
             result_code: 161,
-            message: "Fail to get the follower/following list"
+            message: "Fail to get the following list"
         }); 
     }
-    
-    
+});
+
+router.get('/:userId/followers', async (req,res) => {
+    const { userId } = req.params;
+    console.log("followers:"+userId);
+    try{
+        const userInstance = await UserModel.findOne({ userId });
+        if (userInstance){
+            let follower_list = []
+            console.log("userInstance found");
+            for (const i in userInstance.follower_list){
+                let follower_info = {};
+                let follower_id = userInstance.follower_list[i];
+                follower_info["name"] = await userService.getName(follower_id);
+                follower_info["avatar"] = await userService.getAvatar(follower_id);
+                follower_info["follower_id"]=follower_id;
+                console.log(follower_info);
+                follower_list.push(follower_info);
+
+            }
+            res.status(200).json({
+                result_code: 160,
+                message: "Successfully get the follower list.",
+                follower_list: follower_list
+            }); 
+        }else{
+            res.status(400).json({
+                result_code : -10,
+                message: "user not found"
+            }); 
+        }
+    }catch(err){
+        console.log(err);
+        res.status(200).json({
+            result_code: 161,
+            message: "Fail to get the follower list"
+        }); 
+    }
 });
 
 router.patch('/:userId/follow/:follow_userId', async (req,res) => {
     // TODO: need token verification later
     const { userId, follow_userId } = req.params;
+    console.log("add follow");
     try{ 
     const userInstance = await UserModel.findOne({ userId });
     const follow_userInstance = await UserModel.findOne({ userId: follow_userId });
+    console.log("found users");
     if (userInstance && follow_userInstance){
         if (!userInstance.following_list.includes(follow_userId)){
             userInstance.following_list.push(follow_userId);

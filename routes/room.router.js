@@ -46,8 +46,10 @@ router.post('/create/:moderator_id', async (req,res) => {
 router.get('/all_active_rooms', async (req,res) => {
     // [nice to have] sort the rooms
     //  get all active rooms from the database
+    console.log("all_active_rooms ");
     try{
       const activeRooms = await RoomModel.find({ active: true });
+      console.log("retrieved activeRooms");
       let resultRooms = [];
       for (const k in activeRooms){
         let activeRoom = activeRooms[k];
@@ -56,7 +58,7 @@ router.get('/all_active_rooms', async (req,res) => {
         let moderators = activeRoom.moderators;
         newroom["moderator_name"] = await userService.getName(moderators[0].userId);
         newroom["moderator_avatar"] = await userService.getAvatar(moderators[0].userId);
-
+        // console.log("moderator "+k);
         newroom["topics"] = activeRoom["topics"];
         newroom["description"] = activeRoom["description"];
         newroom["name"] = activeRoom["name"];
@@ -136,7 +138,6 @@ router.get('/:roomId/info', async (req,res) => {
     }
     console.log("participant");
     let participants = activeRooms.participants;
-    console.log("participants:"+participants);
     for (const index in participants){
       let participant = participants[index];
       let name = await userService.getName(participant.userId);

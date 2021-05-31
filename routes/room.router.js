@@ -316,17 +316,20 @@ router.patch('/:roomId/remove', async (req,res) => {
     if (err.message==="-35"){res.status(400).json({
       result_code: -35,
       message:"Room is inactive."})}
-    if (err.message==="-30"){res.status(400).json({
+    else if (err.message==="-30"){res.status(400).json({
       result_code: -30,
       message:"Not found roomId."})}
-    if (err.message==="-10"){res.status(400).json({
+    else if (err.message==="-10"){res.status(400).json({
       result_code: -10,
       message:"User not found"})}
-    
-    res.status(200).json({
+    else{
+      res.status(200).json({
         result_code: 258,
         message: "Fail to remove the listener from  the room."
     });
+
+    }
+    
   }
 
 });

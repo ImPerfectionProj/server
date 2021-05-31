@@ -311,17 +311,23 @@ router.patch('/:roomId/participant_list/:new_user_id/leave', async (req,res) => 
         }); 
   } catch(err){
     console.log(err.message)
-    if (err.message==="-30"){res.status(400).json({
-      result_code: -30,
-      message:"Not found roomId."})}
-    if (err.message==="-10"){res.status(400).json({
-      result_code: -10,
-      message:"User not found"})}
-    
-    res.status(200).json({
+    if (err.message==="-30"){
+      res.status(400).json({
+        result_code: -30,
+        message:"Not found roomId."})
+    } else if (err.message==="-10"){
+      res.status(400).json({
+        result_code: -10,
+        message:"User not found"})
+    } else {
+      res.status(200).json({
         result_code: 256,
         message: "Fail to leave the room."
     });
+
+    }
+    
+    
   }
 
 });

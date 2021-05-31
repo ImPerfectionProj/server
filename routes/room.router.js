@@ -46,12 +46,36 @@ router.post('/create/:moderator_id', async (req,res) => {
 router.get('/all_active_rooms', async (req,res) => {
     // [nice to have] sort the rooms
     //  get all active rooms from the database
+    console.log("all_active_rooms ");
     try{
       const activeRooms = await RoomModel.find({ active: true });
+      console.log("retrieved activeRooms");
+      let resultRooms = [];
+      for (const k in activeRooms){
+        let activeRoom = activeRooms[k];
+
+        let newroom = {};
+        let moderators = activeRoom.moderators;
+        newroom["moderator_name"] = await userService.getName(moderators[0].userId);
+        newroom["moderator_avatar"] = await userService.getAvatar(moderators[0].userId);
+        // console.log("moderator "+k);
+        newroom["topics"] = activeRoom["topics"];
+        newroom["description"] = activeRoom["description"];
+        newroom["name"] = activeRoom["name"];
+        newroom["roomId"] = activeRoom["roomId"];
+        newroom["historical_max"] = activeRoom["historical_max"];
+        newroom["starttime"] = activeRoom["starttime"];
+        newroom["createdAt"] = activeRoom["createdAt"];
+        newroom["updatedAt"] = activeRoom["updatedAt"];
+        newroom["participants"] = activeRoom["participants"];
+        newroom["moderator_id"] = activeRoom["moderators"][0].userId;
+
+        resultRooms.push(newroom);
+      }
       res.status(200).json({
         result_code : 200,
         message: "Successfully retrieve active chat room list successfully.",
-        rooms: activeRooms
+        rooms: resultRooms
       }); 
     }catch(err){
       console.log(err.message);
@@ -101,37 +125,36 @@ router.get('/:roomId/info', async (req,res) => {
   let moderator_list = [];
   try{
   const activeRooms = await RoomModel.findOne({ roomId });
+  console.log(activeRooms)
   if (activeRooms && activeRooms.active){
     // console.log("inside");
     let moderators = activeRooms.moderators;
-      
-      for (const i in moderators){
-        let moderator_name = await userService.getName(moderators[i]);
-        let moderator_avatar = await userService.getAvatar(moderators[i]);
-        moderator_list.push({"moderator_name":moderator_name,
-        "moderator_avatar":moderator_avatar});
+    console.log("moderator");
+    for (const i in moderators){
+      let moderator_name = await userService.getName(moderators[i].userId);
+      let moderator_avatar = await userService.getAvatar(moderators[i].userId);
+      moderator_list.push({"moderator_name":moderator_name,
+      "moderator_avatar":moderator_avatar});
+    }
+    console.log("participant");
+    let participants = activeRooms.participants;
+    for (const index in participants){
+      let participant = participants[index];
+      let name = await userService.getName(participant.userId);
+      let avatar = await userService.getAvatar(participant.userId);
+      if (name!==null){
+        participant_list.push({
+          "name": name, 
+          "avatar":avatar,
+          "anonymous":participant.anonymous,
+          "canSpeak":participant.canSpeak})
+      } else{
+        participant_list.push({
+          "name": "Anonymous", 
+          "avatar":avatar,
+          "anonymous":participant.anonymous,
+          "canSpeak":participant.canSpeak})
       }
-      const participants = activeRooms.participants;
-      for (const index in participants){
-        let participant = participants[index];
-        console.log(participant)
-        let name = await userService.getName(participant.userId);
-        console.log(name);
-        let avatar = await userService.getAvatar(participant.userId);
-        console.log(avatar);
-        if (name!==null){
-          participant_list.push({
-            "name": name, 
-            "avatar":avatar,
-            "anonymous":participant.anonymous,
-            "canSpeak":participant.canSpeak})
-        } else{
-          participant_list.push({
-            "name": "Anonymous", 
-            "avatar":avatar,
-            "anonymous":participant.anonymous,
-            "canSpeak":participant.canSpeak})
-        }
       }
     res.status(200).json({
       result_code: 220,

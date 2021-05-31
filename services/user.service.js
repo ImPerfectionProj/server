@@ -45,11 +45,12 @@ const retrieveWithUserIdPassword = async (userId, password) => {
 };
 
 const getName = async (userId) => {
+    // console.log("userId:"+userId)
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser ){
         return null;
     }
-    return retrievedUser.userName;
+    return retrievedUser.username;
 };
 
 
@@ -228,5 +229,4 @@ module.exports = {
     getName
 
   };
-
 

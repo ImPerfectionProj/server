@@ -92,16 +92,20 @@ const joinRoom = async (roomId, userId, anonymous) => {
 
 
 const leaveRoom = async (roomId, userId) => {
+    console.log("start Leave Room");
     const retrievedChatroom = await RoomModel.findOne({roomId});
     if (!retrievedChatroom || ! retrievedChatroom.active){
         throw new Error(`-30`);
     }
+    console.log("retrievedChatroom finished");
     const retrievedUser = await UserModel.findOne({userId});
     if (!retrievedUser){
         throw new Error(`-10`);
     } 
 
-    const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
+    console.log("retrievedUser finished");
+    console.log(retrievedUser);
+    const index = retrievedChatroom.participants.map(a=>a.userId).indexOf(userId);
 
     if (index>=-1){
         retrievedChatroom.participants.splice(index, 1);       
@@ -125,8 +129,8 @@ const leaveRoom = async (roomId, userId) => {
     if (!retrievedUser){
         throw new Error(`-10`);
     } 
-
-    const index = retrievedChatroom.participants.map(a=>a.userId).indexIf(userId);
+    
+    const index = retrievedChatroom.participants.map(a=>a.userId).indexOf(userId);
 
     if (index>=-1){
         retrievedChatroom.participants.splice(index, 1);       

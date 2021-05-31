@@ -214,8 +214,11 @@ router.patch('/:userId/unfollow/:follow_userId', async (req,res) => {
     // TODO: need token verification later
     const { userId, follow_userId } = req.params;
     try{ 
+        console.log(userId+" unfollow "+follow_userId);
     const userInstance = await UserModel.findOne({ userId });
+    console.log("found userId")
     const follow_userInstance = await UserModel.findOne({ userId: follow_userId });
+    console.log("found Moderator")
     if (userInstance && follow_userInstance){
         const following_index = userInstance.following_list.indexOf(follow_userId);
         if (following_index>-1){

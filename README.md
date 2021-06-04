@@ -63,7 +63,9 @@ Note: You need to run backend before or when you are running our frontend codes.
 
 # Some Simple Terminal Command
 `cd [folder_name]`  - go to the folder named folder_name
+
 `cd ..`             - go to the parent directory
+
 `ls`                - list all the files stored in the current folder
 
 

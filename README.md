@@ -68,4 +68,11 @@ Note: You need to run backend before or when you are running our frontend codes.
 
 `ls`                - list all the files stored in the current folder
 
+# Backend Documentations
+## API documentation
+https://docs.google.com/document/d/1xBd8HSa98Rw6_n3C1BEGcwmYcM3nN6Eq7PRDZ2-IayY/edit?usp=sharing
+
+## ER Diagram
+https://drive.google.com/file/d/1ZOiM28z35UNnJxTKi7AlNhN9R3LEWpNz/view?usp=sharing
+
 
